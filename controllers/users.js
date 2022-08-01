@@ -13,8 +13,19 @@ module.exports.createUser = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
-module.exports.getUsersById = (req, res) => {
-  User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+module.exports.getUsersById = async (req, res) => {
+  const user = await User.findById(req.params.id);
+  res.send(user);
+};
+
+module.exports.updateProfile = async (req, res) => {
+  const { name, about } = req.body;
+  const user = await User.findByIdAndUpdate(req.user._id, { name, about });
+  res.send(user);
+};
+
+module.exports.updateAvatar = async (req, res) => {
+  const { avatar } = req.body;
+  const user = await User.findByIdAndUpdate(req.user._id, { avatar });
+  res.send(user);
 };
