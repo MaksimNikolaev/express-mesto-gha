@@ -46,7 +46,15 @@ module.exports.getUsersById = async (req, res) => {
 module.exports.updateProfile = async (req, res) => {
   const { name, about } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(req.user._id, { name, about });
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      {
+        new: true, // обработчик получит на вход обновлённую запись
+        runValidators: true, // данные будут валидированы перед изменением
+        upsert: false, // если пользователь не найден, он будет создан
+      },
+    );
     if (!user) {
       res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
     }
@@ -67,7 +75,15 @@ module.exports.updateProfile = async (req, res) => {
 module.exports.updateAvatar = async (req, res) => {
   const { avatar } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(req.user._id, { avatar });
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      {
+        new: true, // обработчик получит на вход обновлённую запись
+        runValidators: true, // данные будут валидированы перед изменением
+        upsert: false, // если пользователь не найден, он будет создан
+      },
+    );
     if (!user) {
       res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
     }
