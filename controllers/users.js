@@ -19,7 +19,7 @@ module.exports.createUser = async (req, res) => {
     const user = await User.create({ name, about, avatar });
     res.send(user);
   } catch (err) {
-    if (err.name === 'CastError') {
+    if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
       return;
     }
@@ -53,6 +53,10 @@ module.exports.updateProfile = async (req, res) => {
       res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       return;
     }
+    if (err.name === 'ValidationError') {
+      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+      return;
+    }
     res.status(500).send({ message: 'Ошибка по умолчанию.' });
   }
 };
@@ -67,6 +71,10 @@ module.exports.updateAvatar = async (req, res) => {
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+      return;
+    }
+    if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       return;
     }
