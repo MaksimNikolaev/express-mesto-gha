@@ -1,15 +1,16 @@
 const Card = require('../models/card');
-const { BAD_REQUEST_STATUS, NOT_FOUND_STATUS, INTERNAL_SERVER_ERROR_STATUS } = require('../utils/constants');
+const {
+  BAD_REQUEST_STATUS,
+  NOT_FOUND_STATUS,
+  INTERNAL_SERVER_ERROR_STATUS,
+  CREATED_STATUS,
+} = require('../utils/constants');
 
 module.exports.getCards = async (req, res) => {
   try {
     const card = await Card.find({});
     res.send(card);
   } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные' });
-      return;
-    }
     res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
   }
 };
@@ -19,12 +20,9 @@ module.exports.createCard = async (req, res) => {
   const owner = req.user._id;
   try {
     const card = await Card.create({ name, link, owner });
-    res.send(card);
+    res.status(CREATED_STATUS).send(card);
   } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при создании карточки.' });
-      return;
-    }
+    res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при создании карточки.' });
     if (err.name === 'ValidationError') {
       res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при создании карточки.' });
       return;
@@ -38,6 +36,7 @@ module.exports.deleteCardById = async (req, res) => {
     const card = await Card.findByIdAndRemove(req.params.cardId);
     if (!card) {
       res.status(NOT_FOUND_STATUS).send({ message: 'Карточка с указанным _id не найдена.' });
+      return;
     }
     res.send(card);
   } catch (err) {
@@ -58,6 +57,7 @@ module.exports.likeCard = async (req, res) => {
     );
     if (!card) {
       res.status(NOT_FOUND_STATUS).send({ message: 'Передан несуществующий _id карточки.' });
+      return;
     }
     res.send(card);
   } catch (err) {
@@ -78,6 +78,7 @@ module.exports.dislikeCard = async (req, res) => {
     );
     if (!card) {
       res.status(NOT_FOUND_STATUS).send({ message: 'Передан несуществующий _id карточки.' });
+      return;
     }
     res.send(card);
   } catch (err) {

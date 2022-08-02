@@ -1,15 +1,17 @@
 const User = require('../models/user');
-const { BAD_REQUEST_STATUS, NOT_FOUND_STATUS, INTERNAL_SERVER_ERROR_STATUS } = require('../utils/constants');
+const {
+  BAD_REQUEST_STATUS,
+  NOT_FOUND_STATUS,
+  INTERNAL_SERVER_ERROR_STATUS,
+  CREATED_STATUS,
+} = require('../utils/constants');
 
 module.exports.getUsers = async (req, res) => {
   try {
     const user = await User.find({});
     res.send(user);
   } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные' });
-      return;
-    }
+    res.status(BAD_REQUEST_STATUS).send({ message: `Переданы некорректные данные ${err}` });
     res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
   }
 };
@@ -18,10 +20,10 @@ module.exports.createUser = async (req, res) => {
   const { name, about, avatar } = req.body;
   try {
     const user = await User.create({ name, about, avatar });
-    res.send(user);
+    res.status(CREATED_STATUS).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при создании пользователя' });
+      res.status(BAD_REQUEST_STATUS).send({ message: `Переданы некорректные данные при создании пользователя ${err}` });
       return;
     }
     res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
@@ -33,6 +35,7 @@ module.exports.getUsersById = async (req, res) => {
     const user = await User.findById(req.params.userId);
     if (!user) {
       res.status(NOT_FOUND_STATUS).send({ message: 'Пользователь по указанному _id не найден' });
+      return;
     }
     res.send(user);
   } catch (err) {
@@ -58,6 +61,7 @@ module.exports.updateProfile = async (req, res) => {
     );
     if (!user) {
       res.status(NOT_FOUND_STATUS).send({ message: 'Пользователь по указанному _id не найден.' });
+      return;
     }
     res.send(user);
   } catch (err) {
@@ -87,6 +91,7 @@ module.exports.updateAvatar = async (req, res) => {
     );
     if (!user) {
       res.status(NOT_FOUND_STATUS).send({ message: 'Пользователь по указанному _id не найден.' });
+      return;
     }
     res.send(user);
   } catch (err) {
