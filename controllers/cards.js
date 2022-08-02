@@ -34,7 +34,7 @@ module.exports.createCard = async (req, res) => {
 
 module.exports.deleteCardById = async (req, res) => {
   try {
-    const card = await Card.findById(req.params.id);
+    const card = await Card.findById(req.params.cardId);
     res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {

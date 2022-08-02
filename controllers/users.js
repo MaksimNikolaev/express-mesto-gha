@@ -29,7 +29,7 @@ module.exports.createUser = async (req, res) => {
 
 module.exports.getUsersById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.userId);
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
