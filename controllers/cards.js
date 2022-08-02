@@ -57,9 +57,9 @@ module.exports.likeCard = async (req, res) => {
     );
     if (!card) {
       res.status(NOT_FOUND_STATUS).send({ message: 'Передан несуществующий _id карточки.' });
-    } else {
-      res.send(card);
+      return;
     }
+    res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
@@ -78,9 +78,9 @@ module.exports.dislikeCard = async (req, res) => {
     );
     if (!card) {
       res.status(NOT_FOUND_STATUS).send({ message: 'Передан несуществующий _id карточки.' });
-    } else {
-      res.send(card);
+      return;
     }
+    res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
