@@ -24,6 +24,4 @@ app.use((req, res) => {
   res.status(404).send({ message: 'not found 404' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
-});
+app.listen(PORT);

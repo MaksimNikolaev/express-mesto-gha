@@ -1,38 +1,82 @@
 const Card = require('../models/card');
 
-module.exports.getCards = (req, res) => {
-  Card.find({})
-    .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+module.exports.getCards = async (req, res) => {
+  try {
+    const card = await Card.find({});
+    res.send(card);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные' });
+      return;
+    }
+    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+  }
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = async (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
-  Card.create({ name, link, owner })
-    .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+  try {
+    const card = await Card.create({ name, link, owner });
+    res.send(card);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
+      return;
+    }
+    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+  }
 };
 
 module.exports.deleteCardById = async (req, res) => {
-  const card = await Card.findById(req.params.id);
-  res.send(card);
+  try {
+    const card = await Card.findById(req.params.id);
+    res.send(card);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      return;
+    }
+    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+  }
 };
 
 module.exports.likeCard = async (req, res) => {
-  const card = await Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true },
-  );
-  res.send(card);
+  try {
+    const card = await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+      { new: true },
+    );
+    if (!card) {
+      res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+    }
+    res.send(card);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+      return;
+    }
+    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+  }
 };
 
 module.exports.dislikeCard = async (req, res) => {
-  const card = await Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },
-  );
-  res.send(card);
+  try {
+    const card = await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: req.user._id } }, // убрать _id из массива
+      { new: true },
+    );
+    if (!card) {
+      res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+    }
+    res.send(card);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+      return;
+    }
+    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+  }
 };
