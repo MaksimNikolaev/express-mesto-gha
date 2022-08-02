@@ -35,10 +35,13 @@ module.exports.createCard = async (req, res) => {
 module.exports.deleteCardById = async (req, res) => {
   try {
     const card = await Card.findById(req.params.cardId);
+    if (!card) {
+      res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+    }
     res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки.' });
       return;
     }
     res.status(500).send({ message: 'Ошибка по умолчанию.' });

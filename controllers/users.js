@@ -30,10 +30,13 @@ module.exports.createUser = async (req, res) => {
 module.exports.getUsersById = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
+    if (!user) {
+      res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
+    }
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
+      res.status(400).send({ message: 'Переданы некорректные данные.' });
       return;
     }
     res.status(500).send({ message: 'Ошибка по умолчанию.' });
