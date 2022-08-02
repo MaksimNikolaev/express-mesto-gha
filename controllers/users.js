@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const { BAD_REQUEST_STATUS, NOT_FOUND_STATUS, INTERNAL_SERVER_ERROR_STATUS } = require('../utils/constants');
 
 module.exports.getUsers = async (req, res) => {
   try {
@@ -6,10 +7,10 @@ module.exports.getUsers = async (req, res) => {
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Переданы некорректные данные' });
+      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные' });
       return;
     }
-    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
   }
 };
 
@@ -20,10 +21,10 @@ module.exports.createUser = async (req, res) => {
     res.send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
+      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при создании пользователя' });
       return;
     }
-    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
   }
 };
 
@@ -31,15 +32,15 @@ module.exports.getUsersById = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
+      res.status(NOT_FOUND_STATUS).send({ message: 'Пользователь по указанному _id не найден' });
     }
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Переданы некорректные данные.' });
+      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные.' });
       return;
     }
-    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
   }
 };
 
@@ -56,19 +57,19 @@ module.exports.updateProfile = async (req, res) => {
       },
     );
     if (!user) {
-      res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      res.status(NOT_FOUND_STATUS).send({ message: 'Пользователь по указанному _id не найден.' });
     }
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       return;
     }
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       return;
     }
-    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
   }
 };
 
@@ -85,18 +86,18 @@ module.exports.updateAvatar = async (req, res) => {
       },
     );
     if (!user) {
-      res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      res.status(NOT_FOUND_STATUS).send({ message: 'Пользователь по указанному _id не найден.' });
     }
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       return;
     }
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       return;
     }
-    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
   }
 };
