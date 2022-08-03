@@ -3,6 +3,7 @@ const {
   BAD_REQUEST_STATUS,
   NOT_FOUND_STATUS,
   INTERNAL_SERVER_ERROR_STATUS,
+  CREATED_STATUS,
 } = require('../utils/constants');
 
 module.exports.getCards = async (req, res) => {
@@ -19,7 +20,7 @@ module.exports.createCard = async (req, res) => {
   const owner = req.user._id;
   try {
     const card = await Card.create({ name, link, owner });
-    res.send(card);
+    res.status(CREATED_STATUS).send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при создании карточки.' });
