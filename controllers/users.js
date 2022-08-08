@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const {
   BAD_REQUEST_STATUS,
@@ -17,9 +18,15 @@ module.exports.getUsers = async (req, res) => {
 };
 
 module.exports.createUser = async (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   try {
-    const user = await User.create({ name, about, avatar });
+    const hashPassword = await bcrypt.hash(password, 10);
+    console.log(hashPassword);
+    const user = await User.create({
+      name, about, avatar, email, password: hashPassword,
+    });
     res.status(CREATED_STATUS).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
