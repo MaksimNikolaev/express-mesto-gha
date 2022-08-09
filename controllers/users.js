@@ -11,7 +11,7 @@ const ConflictError = require('../errors/Conflict-err');
 module.exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findUserByCredentials(email, password).select('+password');
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       next(new Unauthorized('Неправильные почта или пароль.'));
       return;
@@ -58,7 +58,14 @@ module.exports.createUser = async (req, res, next) => {
     const user = await User.create({
       name, about, avatar, email, password: hashPassword,
     });
-    res.status(CREATED_STATUS).send(user);
+    res.status(CREATED_STATUS).send({
+      user: {
+        email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      },
+    });
   } catch (err) {
     if (err.code === 11000) {
       next(new ConflictError('Такой Email уже существует'));
