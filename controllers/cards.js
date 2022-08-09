@@ -1,21 +1,20 @@
 const Card = require('../models/card');
-const {
-  BAD_REQUEST_STATUS,
-  NOT_FOUND_STATUS,
-  INTERNAL_SERVER_ERROR_STATUS,
-  CREATED_STATUS,
-} = require('../utils/constants');
+const { CREATED_STATUS } = require('../utils/constants');
+const NotFoundError = require('../errors/Not-found-err');
+const ForbiddenError = require('../errors/Forbidden-err');
+const BadRequest = require('../errors/Bad-request-err');
+const InternalServerError = require('../errors/Internal-server-err');
 
-module.exports.getCards = async (req, res) => {
+module.exports.getCards = async (req, res, next) => {
   try {
     const card = await Card.find({});
     res.send(card);
   } catch (err) {
-    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
+    next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
-module.exports.createCard = async (req, res) => {
+module.exports.createCard = async (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   try {
@@ -23,31 +22,35 @@ module.exports.createCard = async (req, res) => {
     res.status(CREATED_STATUS).send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при создании карточки.' });
+      next(new BadRequest(`Переданы некорректные данные ${err}`));
       return;
     }
-    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
+    next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
-module.exports.deleteCardById = async (req, res) => {
+module.exports.deleteCardById = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndRemove(req.params.cardId);
     if (!card) {
-      res.status(NOT_FOUND_STATUS).send({ message: 'Карточка с указанным _id не найдена.' });
+      next(new NotFoundError('Карточка с указанным _id не найдена.'));
       return;
     }
-    res.send(card);
+    if (String(card.owner) === String(req.user._id)) {
+      await card.remove();
+      res.send(card);
+    }
+    next(new ForbiddenError('Нельзя удалить карточку, созданную другим пользователем'));
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные при удалении карточки.' });
+      next(new BadRequest(`Переданы некорректные данные ${err}`));
       return;
     }
-    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
+    next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
-module.exports.likeCard = async (req, res) => {
+module.exports.likeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -55,20 +58,20 @@ module.exports.likeCard = async (req, res) => {
       { new: true },
     );
     if (!card) {
-      res.status(NOT_FOUND_STATUS).send({ message: 'Передан несуществующий _id карточки.' });
+      next(new NotFoundError('Передан несуществующий _id карточки.'));
       return;
     }
     res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+      next(new BadRequest('Переданы некорректные данные для постановки/снятии лайка.'));
       return;
     }
-    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
+    next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
-module.exports.dislikeCard = async (req, res) => {
+module.exports.dislikeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -76,15 +79,15 @@ module.exports.dislikeCard = async (req, res) => {
       { new: true },
     );
     if (!card) {
-      res.status(NOT_FOUND_STATUS).send({ message: 'Передан несуществующий _id карточки.' });
+      next(new NotFoundError('Передан несуществующий _id карточки.'));
       return;
     }
     res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(BAD_REQUEST_STATUS).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+      next(new BadRequest('Переданы некорректные данные для постановки/снятии лайка.'));
       return;
     }
-    res.status(INTERNAL_SERVER_ERROR_STATUS).send({ message: 'Ошибка по умолчанию.' });
+    next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
