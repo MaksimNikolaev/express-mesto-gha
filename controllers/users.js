@@ -60,14 +60,11 @@ module.exports.createUser = async (req, res, next) => {
     });
     res.status(CREATED_STATUS).send(user);
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      next(new BadRequest(`Переданы некорректные данные при создании пользователя ${err}`));
-      return;
-    }
     if (err.code === 11000) {
       next(new ConflictError('Такой Email уже существует'));
+    } else {
+      next(err);
     }
-    next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
