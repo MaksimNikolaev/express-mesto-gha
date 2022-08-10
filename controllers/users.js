@@ -13,13 +13,11 @@ module.exports.login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      next(new Unauthorized('Неправильные почта или пароль.'));
-      return;
+      throw new Unauthorized('Неправильные почта или пароль.');
     }
     const checkPass = await bcrypt.compare(password, user.password);
     if (!checkPass) {
-      next(new Unauthorized('Неправильные почта или пароль.'));
-      return;
+      throw new Unauthorized('Неправильные почта или пароль.');
     }
     const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
     res.send({ token });
