@@ -45,8 +45,7 @@ module.exports.getUser = async (req, res, next) => {
     }
     res.send(user);
   } catch (err) {
-    next(new BadRequest(`Переданы некорректные данные ${err}`));
-    next(new InternalServerError('Ошибка по умолчанию.'));
+    next(err);
   }
 };
 
