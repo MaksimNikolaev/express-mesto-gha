@@ -47,6 +47,7 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
   res.status(err.statusCode).send({ message: err.message });
+  next();
 });
 
 app.listen(PORT);
