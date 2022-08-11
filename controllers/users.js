@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { CREATED_STATUS } = require('../utils/constants');
 const NotFoundError = require('../errors/Not-found-err');
 const Unauthorized = require('../errors/Unauthorized-err');
 const BadRequest = require('../errors/Bad-request-err');
@@ -56,7 +55,7 @@ module.exports.createUser = async (req, res, next) => {
     const user = await User.create({
       name, about, avatar, email, password: hashPassword,
     });
-    res.status(CREATED_STATUS).send({
+    res.send({
       user: {
         email: user.email,
         name: user.name,
