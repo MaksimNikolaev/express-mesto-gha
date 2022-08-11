@@ -1,15 +1,3 @@
-const BAD_REQUEST_STATUS = 400;
-const UNAUTHORIZED_STATUS = 401;
-const FORBIDDEN_STATUS = 403;
-const NOT_FOUND_STATUS = 404;
-const INTERNAL_SERVER_ERROR_STATUS = 500;
-const CREATED_STATUS = 201;
+const regExpUrl = /^https?:\/\/(w{3}\.)?[a-z\d]+\.[\w\-._~:/?#[\]@!$&'()*+,;=]{2,}#?$/i;
 
-module.exports = {
-  BAD_REQUEST_STATUS,
-  UNAUTHORIZED_STATUS,
-  FORBIDDEN_STATUS,
-  NOT_FOUND_STATUS,
-  INTERNAL_SERVER_ERROR_STATUS,
-  CREATED_STATUS,
-};
+module.exports = regExpUrl;

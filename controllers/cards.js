@@ -1,5 +1,4 @@
 const Card = require('../models/card');
-const { CREATED_STATUS } = require('../utils/constants');
 const NotFoundError = require('../errors/Not-found-err');
 const ForbiddenError = require('../errors/Forbidden-err');
 const BadRequest = require('../errors/Bad-request-err');
@@ -19,7 +18,7 @@ module.exports.createCard = async (req, res, next) => {
   const owner = req.user._id;
   try {
     const card = await Card.create({ name, link, owner });
-    res.status(CREATED_STATUS).send(card);
+    res.send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
       next(new BadRequest(`Переданы некорректные данные ${err}`));
@@ -31,7 +30,7 @@ module.exports.createCard = async (req, res, next) => {
 
 module.exports.deleteCardById = async (req, res, next) => {
   try {
-    const card = await Card.findByIdAndRemove(req.params.cardId);
+    const card = await Card.findById(req.params.cardId);
     if (!card) {
       next(new NotFoundError('Карточка с указанным _id не найдена.'));
       return;
@@ -39,6 +38,7 @@ module.exports.deleteCardById = async (req, res, next) => {
     if (String(card.owner) === String(req.user._id)) {
       await card.remove();
       res.send(card);
+      return;
     }
     next(new ForbiddenError('Нельзя удалить карточку, созданную другим пользователем'));
   } catch (err) {

@@ -13,17 +13,16 @@ module.exports.login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      next(new Unauthorized('Неправильные почта или пароль.'));
+      return next(new Unauthorized('Неправильные почта или пароль.'));
     }
     const checkPass = await bcrypt.compare(password, user.password);
     if (!checkPass) {
-      next(new Unauthorized('Неправильные почта или пароль.'));
+      return next(new Unauthorized('Неправильные почта или пароль.'));
     }
     const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-    res.send({ token });
+    return res.send({ token });
   } catch (err) {
-    next(new BadRequest(`Переданы некорректные данные ${err}`));
-    next(new InternalServerError('Ошибка по умолчанию.'));
+    return next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
@@ -32,7 +31,6 @@ module.exports.getUsers = async (req, res, next) => {
     const user = await User.find({});
     res.send(user);
   } catch (err) {
-    next(new BadRequest(`Переданы некорректные данные ${err}`));
     next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };

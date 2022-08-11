@@ -7,12 +7,13 @@ const {
   updateProfile,
   updateAvatar,
 } = require('../controllers/users');
+const regExpUrl = require('../utils/constants');
 
 router.get('/', getUsers);
 router.get('/me', getUser);
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().length(24),
+    userId: Joi.string().length(24).hex().required(),
   }),
 }), getUsersById);
 router.patch('/me', celebrate({
@@ -23,7 +24,7 @@ router.patch('/me', celebrate({
 }), updateProfile);
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(/^https?:\/\/(w{3}\.)?[a-z\d]+\.[\w\-._~:/?#[\]@!$&'()*+,;=]{2,}#?$/i),
+    avatar: Joi.string().required().pattern(regExpUrl),
   }),
 }), updateAvatar);
 
